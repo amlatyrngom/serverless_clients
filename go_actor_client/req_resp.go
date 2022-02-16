@@ -13,11 +13,19 @@ const (
 	MISSING                    = iota
 )
 
+type SchedulingMechanism int
+
+const (
+	DEFAULT_SCHEDULE SchedulingMechanism = iota
+	ANTI_AFFINITY                        = iota
+)
+
 type StartReq struct {
 	DeploymentId int64   `json:"deployment_id"`
 	Cpus         float32 `json:"cpus"`
 	Mem          float32 `json:"mem"`
 	Args         string  `json:"args"`
+	// TODO: Add scheduling mechanism
 }
 
 type StopReq struct {

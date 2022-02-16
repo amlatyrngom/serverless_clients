@@ -58,6 +58,9 @@ func (client *ActorClient) NewActor(action_id int64, running_state RunningState,
 		Client:   client,
 		State:    running_state,
 		Address:  address,
+		Conn: &http.Client{
+			Timeout: time.Second * 10,
+		},
 	}
 }
 
@@ -77,7 +80,8 @@ func NewClient(db_host string, db_port string, db_pwd string) (*ActorClient, err
 	// Find actor manager
 	err = client.FindLeader()
 	if err != nil {
-		return nil, err
+		log.Printf("Leader not yet found: %v\n", err)
+		return &client, err
 	}
 	client.http_client = &http.Client{
 		Timeout: time.Second * 10,
@@ -86,7 +90,7 @@ func NewClient(db_host string, db_port string, db_pwd string) (*ActorClient, err
 	var resp PingResp
 	err = GetToJson(client.http_client, fmt.Sprintf("http://%s/ping", client.leader_address), &resp)
 	if err != nil {
-		return nil, err
+		return &client, err
 	}
 	return &client, nil
 }
